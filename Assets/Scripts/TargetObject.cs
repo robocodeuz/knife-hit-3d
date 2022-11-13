@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class TargetObject : MonoBehaviour
 {
-    #region Rotation Descriptions
     [System.Serializable] public class RotationDescription
     {
         public enum DescriptionType
@@ -13,27 +13,23 @@ public class TargetObject : MonoBehaviour
             sinewaver
         }
         public DescriptionType type;
-        public Vector3 Get(float dt)
+        public Vector3 Get(float dt, float done)
         {
             switch(type)
             {
-                case DescriptionType.linear : return direction * dt;
-                
+                case DescriptionType.linear: return direction * dt;
+                case DescriptionType.sinewaver: return Mathf.Sin(done / duration * Mathf.PI * 2) * direction;
             }
             return Vector3.zero;
         }
         public Vector3 direction;
         public float duration;
     }
-    #endregion
 
-    public int currentBehaviorIndex;
-    public float durationCompleted;
-    public List<RotationDescription> behaviors;
-    public RotationDescription Behavior
-    {
-        get => behaviors[currentBehaviorIndex];
-    }
+    public int _currentBehaviorIndex;
+    public float _durationCompleted;
+    public List<RotationDescription> _behaviors;
+    public RotationDescription Behavior => _behaviors[_currentBehaviorIndex];
 
 
     private void Start()
@@ -42,14 +38,14 @@ public class TargetObject : MonoBehaviour
     }
     private void Update()
     {
-        durationCompleted += Time.deltaTime;
-        transform.Rotate(Behavior.Get(Time.deltaTime));
-        if (durationCompleted >= Behavior.duration)
+        _durationCompleted += Time.deltaTime;
+        transform.Rotate(Behavior.Get(Time.deltaTime, _durationCompleted));
+        if (_durationCompleted >= Behavior.duration)
         {
-            durationCompleted = 0;
-            currentBehaviorIndex++;
-            if (currentBehaviorIndex >= behaviors.Count)
-                currentBehaviorIndex = 0;
+            _durationCompleted = 0;
+            _currentBehaviorIndex++;
+            if (_currentBehaviorIndex >= _behaviors.Count)
+                _currentBehaviorIndex = 0;
         }
     }
     private void OnCollisionEnter(Collision collision)
