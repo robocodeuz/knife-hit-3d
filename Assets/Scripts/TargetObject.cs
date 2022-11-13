@@ -34,7 +34,11 @@ public class TargetObject : MonoBehaviour
 
     private void Start()
     {
-        
+        int c = Random.Range(2, 10);
+        for (int i = 0; i < c; i++)
+        {
+            
+        }
     }
     private void Update()
     {
